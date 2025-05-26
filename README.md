@@ -19,9 +19,11 @@ I'm a cybersecurity student passionate about ethical hacking, red teaming, and o
 ---
 
 ### 📂 Featured Repositories
+
 - [ethical-hacking-labs](https://github.com/Samritsec/ethical-hacking-labs) – My hands-on pentesting projects (Kali + Metasploitable)
 - [nmap-cheatsheet](https://github.com/Samritsec/nmap-cheatsheet) – Common recon commands
 - [linux-priv-esc-lab](https://github.com/Samritsec/linux-priv-esc-lab) – Privilege escalation examples & scripts
+
 
 ---
 
