@@ -26,5 +26,5 @@ I'm a cybersecurity student passionate about ethical hacking, red teaming, and o
 ---
 
 ### 📫 Let's Connect
-- LinkedIn: [linkedin.com/in/samritshrestha](https://linkedin.com/in/samritshrestha)
+- LinkedIn: [linkedin.com/in/samritshrestha][(https://www.linkedin.com/in/samrit-shrestha) 
 - GitHub: [@Samritsec](https://github.com/Samritsec)
