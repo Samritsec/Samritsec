@@ -87,8 +87,12 @@ async def websocket_endpoint(websocket: WebSocket):
             if message:
                 # Echo logic to be replaced by Orchestrator
                 from agents.orchestrator import process_message
+                from voice.voice_agent import speak
                 response = process_message(message)
                 await ws_manager.send_message(response, websocket)
+
+                # Speak the response using the voice agent
+                speak(response)
 
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
