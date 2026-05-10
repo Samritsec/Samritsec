@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+websockets
+PyJWT
+chromadb
+playwright
+customtkinter
+cryptography
+apscheduler
+watchdog
+psutil
