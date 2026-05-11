@@ -16,20 +16,23 @@ if not exist "server\venv\Scripts\python.exe" (
     exit /b
 )
 
+:: Change directly into the server directory so paths are simple
+cd /d "%~dp0server"
+
 :: Start the FastAPI Server in a new window
 echo [INFO] Launching NOVA Server...
-start "NOVA Server" cmd /k "cd server && venv\Scripts\python.exe server_v6.py"
+start "NOVA Server" cmd /k "venv\Scripts\python.exe server_v6.py"
 
 :: Give the server a few seconds to initialize
 timeout /t 3 /nobreak > nul
 
 :: Start the CustomTkinter Client in a new window
 echo [INFO] Launching NOVA Client UI...
-start "NOVA Client" cmd /k "cd server && venv\Scripts\python.exe nova_client.py"
+start "NOVA Client" cmd /k "venv\Scripts\python.exe nova_client.py"
 
 :: Optionally start the floating toggle
 echo [INFO] Launching NOVA Floating Toggle...
-start "NOVA Toggle" cmd /k "cd server && venv\Scripts\python.exe nova_floating_toggle.py"
+start "NOVA Toggle" cmd /k "venv\Scripts\python.exe nova_floating_toggle.py"
 
 echo.
 echo [SUCCESS] NOVA has been launched.

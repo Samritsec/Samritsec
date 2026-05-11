@@ -77,8 +77,12 @@ class NovaFloatingToggle(ctk.CTk):
             client_script = os.path.join(BASE_DIR, "nova_client.py")
             server_script = os.path.join(BASE_DIR, "server_v6.py")
 
-            subprocess.Popen([sys.executable, server_script])
-            subprocess.Popen([sys.executable, client_script])
+            # Use the venv python if available, else sys.executable
+            venv_python = os.path.join(BASE_DIR, "venv", "Scripts", "python.exe")
+            python_exe = venv_python if os.path.exists(venv_python) else sys.executable
+
+            subprocess.Popen([python_exe, server_script])
+            subprocess.Popen([python_exe, client_script])
         except Exception as e:
             print(f"Error launching NOVA: {e}")
 

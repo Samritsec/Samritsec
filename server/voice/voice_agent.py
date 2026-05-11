@@ -1,8 +1,14 @@
 import pyttsx3
 import threading
+import sys
 
 def _speak_text(text: str):
     try:
+        # Initialize COM on Windows for pyttsx3 thread safety
+        if sys.platform == "win32":
+            import pythoncom
+            pythoncom.CoInitialize()
+
         engine = pyttsx3.init()
 
         # Adjust properties for a "little deep but comforting" voice
