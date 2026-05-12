@@ -20,7 +20,11 @@ class NovaFloatingToggle(ctk.CTk):
         self.attributes("-topmost", True)
 
         # Transparent background if possible (Windows)
-        self.attributes("-transparentcolor", "black")
+        if sys.platform == "win32":
+            try:
+                self.attributes("-transparentcolor", "black")
+            except Exception:
+                pass
         self.configure(fg_color="black")
 
         # Position on bottom right screen
