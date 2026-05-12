@@ -23,12 +23,27 @@ server\venv\Scripts\python.exe -m pip install --upgrade pip
 
 echo [INFO] Installing server dependencies...
 server\venv\Scripts\pip.exe install -r server\requirements_server.txt
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Failed to install server dependencies. Please check the errors above.
+    pause
+    exit /b
+)
 
 echo [INFO] Installing client dependencies...
 server\venv\Scripts\pip.exe install -r server\requirements_client.txt
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Failed to install client dependencies. Please check the errors above.
+    pause
+    exit /b
+)
 
 echo [INFO] Installing Python-docx for generating architecture documents...
 server\venv\Scripts\pip.exe install python-docx
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Failed to install python-docx. Please check the errors above.
+    pause
+    exit /b
+)
 
 echo ==============================================
 echo [SUCCESS] NOVA setup complete!

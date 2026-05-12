@@ -19,6 +19,15 @@ if not exist "server\venv\Scripts\python.exe" (
 :: Change directly into the server directory so paths are simple
 cd /d "%~dp0server"
 
+:: Perform a quick health check to see if critical packages are installed
+venv\Scripts\python.exe -c "import jwt, customtkinter" >nul 2>&1
+if %ERRORLEVEL% neq 0 (
+    echo [ERROR] Required libraries are missing. The virtual environment is incomplete.
+    echo Please run INSTALL.bat again and ensure it finishes without errors.
+    pause
+    exit /b
+)
+
 :: Start the FastAPI Server in a new window
 echo [INFO] Launching NOVA Server...
 start "NOVA Server" cmd /k "venv\Scripts\python.exe server_v6.py"

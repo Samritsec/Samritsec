@@ -18,7 +18,8 @@ def _speak_text(text: str):
         # Fallback to the first voice if no specific male voice is found.
         chosen_voice = voices[0].id
         for voice in voices:
-            if "male" in voice.name.lower() or "david" in voice.name.lower() or "zira" not in voice.name.lower():
+            v_name = voice.name.lower()
+            if "male" in v_name or "david" in v_name or "brian" in v_name:
                 chosen_voice = voice.id
                 break
 
