@@ -89,9 +89,25 @@ async def websocket_endpoint(websocket: WebSocket):
                 from agents.orchestrator import process_message
                 from voice.voice_agent import speak
 
+                # Tell the client we are starting a stream
+                await websocket.send_json({"type": "stream_start"})
+
+                # Capture the main event loop before offloading to worker thread
+                loop = asyncio.get_running_loop()
+
+                # Define a thread-safe callback to send chunks over websocket
+                def on_chunk(chunk):
+                    # We must schedule this on the captured main event loop
+                    asyncio.run_coroutine_threadsafe(
+                        websocket.send_json({"type": "stream_chunk", "content": chunk}),
+                        loop
+                    )
+
                 # Offload synchronous LLM generation to a background thread to unblock ASGI event loop
-                response = await asyncio.to_thread(process_message, message)
-                await ws_manager.send_message(response, websocket)
+                response = await asyncio.to_thread(process_message, message, on_chunk)
+
+                # Tell the client the stream is done
+                await websocket.send_json({"type": "stream_end"})
 
                 # Offload synchronous TTS to a background thread
                 await asyncio.to_thread(speak, response)

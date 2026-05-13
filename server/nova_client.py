@@ -69,7 +69,24 @@ class NovaClientUI(ctk.CTk):
         self.send_btn = ctk.CTkButton(self.input_frame, text="Send", width=80, height=40, command=lambda: self.send_message(None))
         self.send_btn.grid(row=0, column=2, padx=(10, 0))
 
+        self.status_indicator = ctk.CTkButton(self.input_frame, text="", width=20, height=20, corner_radius=10, fg_color="red", state="disabled")
+        self.status_indicator.grid(row=0, column=3, padx=(10, 0))
+
         self.append_chat("SYSTEM", "NOVA Interface Initialized. Awaiting Connection...")
+
+        # Start background network check
+        threading.Thread(target=self.check_network_loop, daemon=True).start()
+
+    def check_network_loop(self):
+        import socket
+        while True:
+            try:
+                # Attempt to connect to Google's public DNS to verify internet access
+                socket.create_connection(("8.8.8.8", 53), timeout=2)
+                self.after(0, lambda: self.status_indicator.configure(fg_color="green"))
+            except OSError:
+                self.after(0, lambda: self.status_indicator.configure(fg_color="red"))
+            time.sleep(5)
 
     def draw_orb(self, radius):
         self.orb_canvas.delete("all")
@@ -104,6 +121,24 @@ class NovaClientUI(ctk.CTk):
         self.chat_box.see("end")
         self.chat_box.configure(state="disabled")
 
+    def stream_chat_start(self, sender):
+        self.chat_box.configure(state="normal")
+        self.chat_box.insert("end", f"[{sender}] ")
+        self.chat_box.see("end")
+        self.chat_box.configure(state="disabled")
+
+    def stream_chat_chunk(self, chunk):
+        self.chat_box.configure(state="normal")
+        self.chat_box.insert("end", chunk)
+        self.chat_box.see("end")
+        self.chat_box.configure(state="disabled")
+
+    def stream_chat_end(self):
+        self.chat_box.configure(state="normal")
+        self.chat_box.insert("end", "\n\n")
+        self.chat_box.see("end")
+        self.chat_box.configure(state="disabled")
+
     def start_async_loop(self):
         asyncio.set_event_loop(self.loop)
         self.loop.run_until_complete(self.connect_ws())
@@ -122,10 +157,19 @@ class NovaClientUI(ctk.CTk):
 
                     if data.get("type") == "connected":
                         self.after(0, self.append_chat, "NOVA", "Connection established. Secure channel active.")
+                    elif data.get("type") == "stream_start":
+                        self.after(0, self.stream_chat_start, "NOVA")
+                    elif data.get("type") == "stream_chunk":
+                        chunk = data.get("content", "")
+                        self.after(0, self.stream_chat_chunk, chunk)
+                    elif data.get("type") == "stream_end":
+                        self.after(0, self.stream_chat_end)
+                        self.after(0, self.trigger_speaking_animation)
                     elif data.get("type") == "response":
                         msg = data.get("content", "")
-                        self.after(0, self.append_chat, "NOVA", msg)
-                        self.after(0, self.trigger_speaking_animation)
+                        # Backwards compatibility if stream is disabled
+                        # self.after(0, self.append_chat, "NOVA", msg)
+                        pass
 
         except Exception as e:
             self.after(0, self.append_chat, "ERROR", f"Connection failed: {e}")

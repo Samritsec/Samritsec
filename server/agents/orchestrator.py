@@ -21,27 +21,46 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 # Updated to match user's installed models to avoid 404 errors
 DEFAULT_MODEL = "llama3.1:8b"
 
-def query_ollama(prompt: str, context: str = "") -> str:
-    """Helper function to query local Ollama model."""
+def query_ollama(prompt: str, context: str = "", chunk_callback=None) -> str:
+    """Helper function to query local Ollama model with optional streaming support."""
     full_prompt = f"{NOVA_SYSTEM_PROMPT}\n\nContext:\n{context}\n\nUser: {prompt}\nNOVA:"
     payload = {
         "model": DEFAULT_MODEL,
         "prompt": full_prompt,
-        "stream": False
+        "stream": bool(chunk_callback)
     }
     try:
         # Increased timeout to 120s to allow local models time to load into memory
-        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120, stream=bool(chunk_callback))
         if response.status_code == 200:
-            return response.json().get("response", "I encountered an anomaly, sir.")
+            if chunk_callback:
+                full_response = ""
+                for line in response.iter_lines():
+                    if line:
+                        data = json.loads(line)
+                        chunk = data.get("response", "")
+                        if chunk:
+                            chunk_callback(chunk)
+                            full_response += chunk
+                return full_response
+            else:
+                return response.json().get("response", "I encountered an anomaly, sir.")
         elif response.status_code == 404:
-            return f"Sir, my neural link to {DEFAULT_MODEL} returned error code 404. The model might not be downloaded. Please run 'ollama run {DEFAULT_MODEL}' in your terminal."
+            msg = f"Sir, my neural link to {DEFAULT_MODEL} returned error code 404. The model might not be downloaded. Please run 'ollama run {DEFAULT_MODEL}' in your terminal."
+            if chunk_callback: chunk_callback(msg)
+            return msg
         else:
-            return f"Sir, my neural link to {DEFAULT_MODEL} returned error code {response.status_code}."
+            msg = f"Sir, my neural link to {DEFAULT_MODEL} returned error code {response.status_code}."
+            if chunk_callback: chunk_callback(msg)
+            return msg
     except requests.exceptions.ConnectionError:
-        return "Sir, I cannot reach the Ollama engine. Please ensure it is running on localhost:11434."
+        msg = "Sir, I cannot reach the Ollama engine. Please ensure it is running on localhost:11434."
+        if chunk_callback: chunk_callback(msg)
+        return msg
     except Exception as e:
-        return f"Sir, an unexpected error occurred in my core processor: {e}"
+        msg = f"Sir, an unexpected error occurred in my core processor: {e}"
+        if chunk_callback: chunk_callback(msg)
+        return msg
 
 def intent_agent(msg: str) -> str:
     # Classifies message intent. Dummy implementation for now.
@@ -63,20 +82,25 @@ def memory_agent() -> str:
         context += f"{speaker}: {text}\n"
     return context
 
-def tier_1_instant(msg: str) -> str:
+def tier_1_instant(msg: str, chunk_callback=None) -> str:
     msg_lower = msg.lower()
+    response = None
     if msg_lower in ["hi", "hello", "hey"]:
-        return "Hello, Sam. Systems are online and I am ready."
+        response = "Hello, Sam. Systems are online and I am ready."
     elif msg_lower in ["bye", "exit", "sleep"]:
-        return "Goodbye, Sam. I will continue monitoring the system in the background."
-    return None
+        response = "Goodbye, Sam. I will continue monitoring the system in the background."
 
-def tier_2_fast(msg: str) -> str:
+    if response and chunk_callback:
+        chunk_callback(response)
+
+    return response
+
+def tier_2_fast(msg: str, chunk_callback=None) -> str:
     # Quick, standard intelligence response using local memory context
     context = memory_agent()
-    return query_ollama(msg, context)
+    return query_ollama(msg, context, chunk_callback)
 
-def tier_3_full(msg: str) -> str:
+def tier_3_full(msg: str, chunk_callback=None) -> str:
     # Full pipeline: Intent -> Planning -> Research/Memory -> Code -> Critic
     # Mocking the pipeline for now, routing to Ollama
     context = memory_agent()
@@ -84,16 +108,16 @@ def tier_3_full(msg: str) -> str:
         res = research_agent(msg)
         context += f"\n[System Data]: {res}"
 
-    return query_ollama(msg, context)
+    return query_ollama(msg, context, chunk_callback)
 
-def process_message(msg: str) -> str:
+def process_message(msg: str, chunk_callback=None) -> str:
     """Routes the message through the 3 tiers."""
 
     # Save the user's message to memory
     memory.save_conversation("Sam", msg)
 
     # 1. Tier 1
-    t1 = tier_1_instant(msg)
+    t1 = tier_1_instant(msg, chunk_callback)
     if t1:
         memory.save_conversation("NOVA", t1)
         return t1
@@ -102,9 +126,9 @@ def process_message(msg: str) -> str:
     intent = intent_agent(msg)
 
     if intent == "fast":
-        response = tier_2_fast(msg)
+        response = tier_2_fast(msg, chunk_callback)
     else:
-        response = tier_3_full(msg)
+        response = tier_3_full(msg, chunk_callback)
 
     # Save NOVA's response
     memory.save_conversation("NOVA", response)
