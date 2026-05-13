@@ -49,7 +49,16 @@ def capture_and_analyze_screen(task_context: str, chunk_callback=None) -> str:
                 import json
                 return response.json().get("response", "Visual analysis complete.")
         elif response.status_code == 404:
-            msg = f"\n[Vision Error]: The vision model '{VISION_MODEL}' is not installed. Please run 'ollama run {VISION_MODEL}' to enable my eyes."
+            # Attempt to auto-pull the model in the background so it works next time
+            import threading
+            def pull_model():
+                try:
+                    requests.post("http://localhost:11434/api/pull", json={"model": VISION_MODEL}, timeout=600)
+                except:
+                    pass
+            threading.Thread(target=pull_model, daemon=True).start()
+
+            msg = f"\n[Vision Disabled]: The vision model '{VISION_MODEL}' is currently not installed. I have initiated a background download of my optic core. It will be ready shortly."
             if chunk_callback: chunk_callback(msg)
             return msg
         else:
