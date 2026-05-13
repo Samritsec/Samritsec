@@ -85,14 +85,16 @@ async def websocket_endpoint(websocket: WebSocket):
 
             message = data.get("message")
             if message:
-                # Echo logic to be replaced by Orchestrator
+                import asyncio
                 from agents.orchestrator import process_message
                 from voice.voice_agent import speak
-                response = process_message(message)
+
+                # Offload synchronous LLM generation to a background thread to unblock ASGI event loop
+                response = await asyncio.to_thread(process_message, message)
                 await ws_manager.send_message(response, websocket)
 
-                # Speak the response using the voice agent
-                speak(response)
+                # Offload synchronous TTS to a background thread
+                await asyncio.to_thread(speak, response)
 
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)

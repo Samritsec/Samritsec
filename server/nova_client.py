@@ -110,7 +110,8 @@ class NovaClientUI(ctk.CTk):
 
     async def connect_ws(self):
         try:
-            async with websockets.connect(WS_URL) as ws:
+            # Increased ping_timeout to 120s to accommodate slow LLM responses
+            async with websockets.connect(WS_URL, ping_timeout=120, ping_interval=30) as ws:
                 self.ws = ws
                 # Send fake token for initial connection
                 await ws.send(json.dumps({"token": "dev_token_placeholder"}))
