@@ -30,7 +30,8 @@ def query_ollama(prompt: str, context: str = "") -> str:
         "stream": False
     }
     try:
-        response = requests.post(OLLAMA_URL, json=payload, timeout=30)
+        # Increased timeout to 120s to allow local models time to load into memory
+        response = requests.post(OLLAMA_URL, json=payload, timeout=120)
         if response.status_code == 200:
             return response.json().get("response", "I encountered an anomaly, sir.")
         elif response.status_code == 404:
