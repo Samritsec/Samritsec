@@ -25,3 +25,4 @@ pyttsx3
 pywin32; sys_platform == "win32"
 SpeechRecognition
 pyaudio
+openai-whisper
