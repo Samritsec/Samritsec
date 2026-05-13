@@ -33,6 +33,8 @@ def query_ollama(prompt: str, context: str = "") -> str:
         response = requests.post(OLLAMA_URL, json=payload, timeout=30)
         if response.status_code == 200:
             return response.json().get("response", "I encountered an anomaly, sir.")
+        elif response.status_code == 404:
+            return f"Sir, my neural link to {DEFAULT_MODEL} returned error code 404. The model might not be downloaded. Please run 'ollama run {DEFAULT_MODEL}' in your terminal."
         else:
             return f"Sir, my neural link to {DEFAULT_MODEL} returned error code {response.status_code}."
     except requests.exceptions.ConnectionError:
