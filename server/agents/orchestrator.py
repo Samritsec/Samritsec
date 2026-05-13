@@ -112,9 +112,32 @@ def tier_2_fast(msg: str, chunk_callback=None) -> str:
 
 def tier_3_full(msg: str, chunk_callback=None) -> str:
     # Full pipeline: Intent -> Planning -> Research/Memory -> Code -> Critic
-    # Mocking the pipeline for now, routing to Ollama
     context = memory_agent()
-    if "research" in msg.lower():
+
+    msg_lower = msg.lower()
+
+    # Check if the user wants physical action (play music, type, search physically)
+    if any(keyword in msg_lower for keyword in ["play", "type", "search", "automate", "click"]):
+        if chunk_callback:
+            chunk_callback("Initiating multiple brain sequences to plan the task...\n")
+
+        try:
+            from agents.planner_agent import brainstorm_and_walk
+            from system_control.hands_agent import execute_action_plan
+
+            # Step 1: Brainstorm the plan
+            plan = brainstorm_and_walk(msg, chunk_callback)
+
+            # Step 2: Use Hands to execute
+            execution_result = execute_action_plan(plan, chunk_callback)
+            return execution_result
+        except Exception as e:
+            err = f"\n[System Failure in Hands/Legs Module]: {e}"
+            if chunk_callback: chunk_callback(err)
+            return err
+
+    # Standard deep research/complex answer
+    if "research" in msg_lower:
         res = research_agent(msg)
         context += f"\n[System Data]: {res}"
 
