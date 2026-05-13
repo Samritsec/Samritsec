@@ -63,8 +63,11 @@ class NovaClientUI(ctk.CTk):
         self.entry.grid(row=0, column=0, sticky="ew")
         self.entry.bind("<Return>", self.send_message)
 
+        self.mic_btn = ctk.CTkButton(self.input_frame, text="🎤", width=40, height=40, command=self.toggle_listening)
+        self.mic_btn.grid(row=0, column=1, padx=(10, 0))
+
         self.send_btn = ctk.CTkButton(self.input_frame, text="Send", width=80, height=40, command=lambda: self.send_message(None))
-        self.send_btn.grid(row=0, column=1, padx=(10, 0))
+        self.send_btn.grid(row=0, column=2, padx=(10, 0))
 
         self.append_chat("SYSTEM", "NOVA Interface Initialized. Awaiting Connection...")
 
@@ -133,6 +136,27 @@ class NovaClientUI(ctk.CTk):
 
     def stop_speaking_animation(self):
         self.is_speaking = False
+
+    def toggle_listening(self):
+        self.mic_btn.configure(fg_color="red")
+        self.append_chat("SYSTEM", "Listening...")
+        try:
+            from voice.listener import listen_and_transcribe
+            listen_and_transcribe(self._on_transcription)
+        except Exception as e:
+            self.append_chat("ERROR", f"Could not initialize microphone: {e}")
+            self.mic_btn.configure(fg_color=["#3a7ebf", "#1f538d"]) # Reset color
+
+    def _on_transcription(self, text):
+        def update_ui():
+            self.mic_btn.configure(fg_color=["#3a7ebf", "#1f538d"]) # Reset color
+            if text and "Error" not in text and "Indecipherable" not in text:
+                self.entry.delete(0, "end")
+                self.entry.insert(0, text)
+                self.send_message(None)
+            else:
+                self.append_chat("SYSTEM", text)
+        self.after(0, update_ui)
 
     def send_message(self, event):
         msg = self.entry.get().strip()
