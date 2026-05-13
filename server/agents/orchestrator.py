@@ -89,6 +89,16 @@ def tier_1_instant(msg: str, chunk_callback=None) -> str:
         response = "Hello, Sam. Systems are online and I am ready."
     elif msg_lower in ["bye", "exit", "sleep"]:
         response = "Goodbye, Sam. I will continue monitoring the system in the background."
+    else:
+        # Check for system execution commands before routing to LLM
+        if any(cmd in msg_lower for cmd in ["open", "launch", "start"]):
+            try:
+                from system_control.sys_agent import execute_system_command
+                sys_res = execute_system_command(msg_lower)
+                if sys_res:
+                    response = sys_res
+            except Exception as e:
+                response = f"Sir, I encountered an error executing that system command: {e}"
 
     if response and chunk_callback:
         chunk_callback(response)
