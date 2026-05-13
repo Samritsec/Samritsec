@@ -124,15 +124,20 @@ def tier_3_full(msg: str, chunk_callback=None) -> str:
         try:
             from agents.planner_agent import brainstorm_and_walk
             from system_control.hands_agent import execute_action_plan
+            from vision.vision_agent import capture_and_analyze_screen
 
             # Step 1: Brainstorm the plan
             plan = brainstorm_and_walk(msg, chunk_callback)
 
             # Step 2: Use Hands to execute
             execution_result = execute_action_plan(plan, chunk_callback)
-            return execution_result
+
+            # Step 3: Use Eyes to verify
+            vision_result = capture_and_analyze_screen(msg, chunk_callback)
+
+            return execution_result + "\n" + vision_result
         except Exception as e:
-            err = f"\n[System Failure in Hands/Legs Module]: {e}"
+            err = f"\n[System Failure in Hands/Legs/Eyes Module]: {e}"
             if chunk_callback: chunk_callback(err)
             return err
 

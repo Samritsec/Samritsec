@@ -27,3 +27,4 @@ SpeechRecognition
 pyaudio
 openai-whisper
 soundfile
+pillow
