@@ -63,9 +63,11 @@ def query_ollama(prompt: str, context: str = "", chunk_callback=None) -> str:
         return msg
 
 def intent_agent(msg: str) -> str:
-    # Classifies message intent. Dummy implementation for now.
+    # Classifies message intent.
     msg_lower = msg.lower()
-    if any(cmd in msg_lower for cmd in ["nmap", "hack", "scan", "code", "apply", "research", "analyze"]):
+    action_keywords = ["nmap", "hack", "scan", "code", "apply", "research", "analyze", "play", "type", "search", "automate", "click", "open", "launch"]
+
+    if any(cmd in msg_lower for cmd in action_keywords):
         return "complex"
     elif len(msg) < 50:
         return "fast"
@@ -90,8 +92,9 @@ def tier_1_instant(msg: str, chunk_callback=None) -> str:
     elif msg_lower in ["bye", "exit", "sleep"]:
         response = "Goodbye, Sam. I will continue monitoring the system in the background."
     else:
-        # Check for system execution commands before routing to LLM
-        if any(cmd in msg_lower for cmd in ["open", "launch", "start"]):
+        # If the command contains multiple complex actions, do not intercept here. Let Tier 3 handle the multi-step automation.
+        has_complex_verbs = any(cmd in msg_lower for cmd in ["play", "type", "search", "click", "find", "automate"])
+        if not has_complex_verbs and any(cmd in msg_lower for cmd in ["open", "launch", "start"]):
             try:
                 from system_control.sys_agent import execute_system_command
                 sys_res = execute_system_command(msg_lower)
@@ -126,16 +129,28 @@ def tier_3_full(msg: str, chunk_callback=None) -> str:
             from system_control.hands_agent import execute_action_plan
             from vision.vision_agent import capture_and_analyze_screen
 
-            # Step 1: Brainstorm the plan
-            plan = brainstorm_and_walk(msg, chunk_callback)
+            max_attempts = 3
+            previous_feedback = ""
 
-            # Step 2: Use Hands to execute
-            execution_result = execute_action_plan(plan, chunk_callback)
+            for attempt in range(max_attempts):
+                if chunk_callback and attempt > 0:
+                    chunk_callback(f"\n[Attempt {attempt + 1}] Recalibrating plan based on visual feedback...\n")
 
-            # Step 3: Use Eyes to verify
-            vision_result = capture_and_analyze_screen(msg, chunk_callback)
+                # Step 1: Brainstorm the plan (injecting previous feedback if any)
+                plan = brainstorm_and_walk(msg, chunk_callback, previous_feedback)
 
-            return execution_result + "\n" + vision_result
+                # Step 2: Use Hands to execute
+                execution_result = execute_action_plan(plan, chunk_callback)
+
+                # Step 3: Use Eyes to verify
+                vision_result = capture_and_analyze_screen(msg, chunk_callback)
+
+                if "SUCCESS:" in vision_result:
+                    return execution_result + "\n" + vision_result
+                else:
+                    previous_feedback = vision_result
+
+            return f"[Task could not be fully verified after {max_attempts} attempts. Final Status]:\n" + execution_result + "\n" + vision_result
         except Exception as e:
             err = f"\n[System Failure in Hands/Legs/Eyes Module]: {e}"
             if chunk_callback: chunk_callback(err)

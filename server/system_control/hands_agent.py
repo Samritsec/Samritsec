@@ -20,6 +20,17 @@ def execute_action_plan(plan_steps, chunk_callback=None):
 
         if action == "OPEN_URL":
             webbrowser.open(value)
+        elif action == "RUN_CMD":
+            import os
+            import subprocess
+            try:
+                # Try to launch standard windows apps safely
+                os.startfile(value)
+            except:
+                try:
+                    subprocess.Popen(value, shell=True)
+                except Exception as e:
+                    if chunk_callback: chunk_callback(f" Failed to run {value}: {e}")
         elif action == "WAIT":
             try:
                 time.sleep(float(value))

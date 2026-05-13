@@ -6,6 +6,7 @@ PLANNER_PROMPT = """You are NOVA's Executive Planner Brain.
 Your job is to convert a user's action request into a strict JSON array of physical steps for the "Hands" agent to execute.
 The hands agent supports these actions:
 - OPEN_URL (value: string URL)
+- RUN_CMD (value: app name or command to launch, e.g., "notepad.exe", "calc.exe")
 - WAIT (value: seconds to wait)
 - TYPE (value: text to type)
 - PRESS (value: key to press, e.g., "enter", "tab")
@@ -26,12 +27,14 @@ Output:
 
 Respond ONLY with the JSON array. Do not include markdown blocks or any other text."""
 
-def brainstorm_and_walk(task: str, chunk_callback=None) -> list:
+def brainstorm_and_walk(task: str, chunk_callback=None, previous_feedback: str = "") -> list:
     """Brainstorms the steps (multiple brains) and walks through them (legs)."""
     if chunk_callback:
         chunk_callback("\n[Brainstorming sequence plan...]")
 
     full_prompt = f"{PLANNER_PROMPT}\n\nUser Request: {task}"
+    if previous_feedback:
+        full_prompt += f"\n\nWARNING - YOUR PREVIOUS ATTEMPT FAILED. The optic sensors reported: {previous_feedback}\nAdjust your JSON plan to fix this."
 
     # We don't stream the brainstorm generation to the user, we just wait for the JSON
     # so we don't pass chunk_callback to query_ollama here.

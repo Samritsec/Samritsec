@@ -21,7 +21,7 @@ def capture_and_analyze_screen(task_context: str, chunk_callback=None) -> str:
         screenshot.save(buffered, format="JPEG", quality=70)
         img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-        prompt = f"You are NOVA, an AI verifying a task. The user requested: '{task_context}'. Look at this screenshot of the desktop. Briefly confirm if it looks like the task was completed successfully based on what is visible on the screen."
+        prompt = f"You are NOVA, an AI verifying a task. The user requested: '{task_context}'. Look at this screenshot of the desktop. First, explain what you see. Then, at the very end of your response, strictly output either 'SUCCESS:' followed by a confirmation, or 'FAILURE:' followed by what went wrong and what needs to be done next."
 
         payload = {
             "model": VISION_MODEL,
