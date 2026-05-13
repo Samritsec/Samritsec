@@ -5,7 +5,7 @@ from agents.orchestrator import query_ollama
 PLANNER_PROMPT = """You are NOVA's Executive Planner Brain.
 Your job is to convert a user's action request into a strict JSON array of physical steps for the "Hands" agent to execute.
 The hands agent supports these actions:
-- OPEN_URL (value: string URL)
+- OPEN_URL (value: string URL. ALWAYS use this for websites like YouTube, Google, LinkedIn. Never use RUN_CMD for websites.)
 - RUN_CMD (value: app name or command to launch, e.g., "notepad.exe", "calc.exe")
 - WAIT (value: seconds to wait)
 - TYPE (value: text to type)

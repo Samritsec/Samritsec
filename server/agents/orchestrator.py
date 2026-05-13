@@ -147,6 +147,9 @@ def tier_3_full(msg: str, chunk_callback=None) -> str:
 
                 if "SUCCESS:" in vision_result:
                     return execution_result + "\n" + vision_result
+                elif "[Vision Disabled]" in vision_result or "[Vision Error]" in vision_result:
+                    # If the optic core is disabled or errored out, stop retrying immediately
+                    return execution_result + "\n" + vision_result
                 else:
                     previous_feedback = vision_result
 
