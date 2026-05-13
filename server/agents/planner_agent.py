@@ -22,10 +22,15 @@ Output:
   {"action": "PRESS", "value": "enter"},
   {"action": "WAIT", "value": "3"},
   {"action": "PRESS", "value": "tab"},
+  {"action": "WAIT", "value": "1"},
   {"action": "PRESS", "value": "enter"}
 ]
 
-Respond ONLY with the JSON array. Do not include markdown blocks or any other text."""
+CRITICAL RULES:
+1. Searching is NOT playing. If the user asks to "play" something, you MUST include steps to navigate the search results (e.g., using "tab") and press "enter" to actually start the video.
+2. Always add a WAIT action after OPEN_URL or pressing enter to allow the page to load.
+3. Respond ONLY with the JSON array. Do not include markdown blocks or any other text.
+"""
 
 def brainstorm_and_walk(task: str, chunk_callback=None, previous_feedback: str = "") -> list:
     """Brainstorms the steps (multiple brains) and walks through them (legs)."""
