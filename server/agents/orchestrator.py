@@ -18,8 +18,8 @@ CAPABILITIES:
 Never refer to yourself as a simple AI. You are NOVA, Sam's digital right hand."""
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-# You can change this to "qwen2.5" or "llama3" depending on what you pull locally
-DEFAULT_MODEL = "llama3"
+# Updated to match user's installed models to avoid 404 errors
+DEFAULT_MODEL = "llama3.1:8b"
 
 def query_ollama(prompt: str, context: str = "") -> str:
     """Helper function to query local Ollama model."""

@@ -15,15 +15,21 @@ def _listen_worker(callback):
                 text = recognizer.recognize_whisper(audio, model="base")
                 print(f"Recognized: {text}")
                 callback(text)
-            except sr.UnknownValueError:
-                print("Could not understand audio.")
-                callback("...[Indecipherable]...")
-            except sr.RequestError as e:
-                print(f"Speech recognition request error: {e}")
-                callback("...[Error connecting to speech service]...")
-            except Exception as e:
-                print(f"Speech recognition error: {e}")
-                callback(f"...[Speech Recognition Error: {str(e)[:50]}]...")
+            except Exception as whisper_e:
+                print(f"Whisper failed (possibly missing ffmpeg): {whisper_e}. Falling back to Google SR...")
+                try:
+                    text = recognizer.recognize_google(audio)
+                    print(f"Recognized (Google fallback): {text}")
+                    callback(text)
+                except sr.UnknownValueError:
+                    print("Could not understand audio.")
+                    callback("...[Indecipherable]...")
+                except sr.RequestError as e:
+                    print(f"Speech recognition request error: {e}")
+                    callback("...[Error connecting to speech service]...")
+                except Exception as e:
+                    print(f"Speech recognition error: {e}")
+                    callback(f"...[Speech Recognition Error: {str(e)[:50]}]...")
     except Exception as e:
         print(f"Microphone error: {e}")
         callback("...[Microphone Error]...")
