@@ -1,34 +1,22 @@
-# NOVA v6 CAPSULE
+# NOVA v1
+**Linux-First AI Workstation Ecosystem**
 
-Welcome to **NOVA**, a Jarvis-inspired autonomous personal AI agent for Windows PC.
+NOVA is a modular, user-friendly desktop shell and AI orchestrator. It is built natively for Linux, serving as a powerful assistant overlaid with offensive/defensive security tools, developer workspaces, and sandboxed autonomy.
 
-NOVA is a 3-tier intelligence routing orchestrator with an encrypted local memory system. It offers a sleek, dark-themed CustomTkinter UI client and a floating toggle desktop widget for quick access.
+## Project Goal
+To create a strictly controlled but highly capable AI environment that can:
+- Assist in daily workflow via a modern GUI.
+- Plan and execute complex tasks safely.
+- Utilize modular tool packs.
+- Maintain an encrypted, persistent memory state.
 
-## Features
+## Current State: Phase 1
+This repository has been reset to Phase 1. The old Windows-based legacy architecture has been completely purged.
 
-- **3-Tier Intelligence Routing Orchestrator**: Uses different tiers of processing for fast, standard, and deep thought tasks.
-- **Encrypted Local Memory**: Uses SQLite and Fernet for secure, private local storage.
-- **Floating Toggle Widget**: A frameless, always-on-top desktop widget for quick launching.
-- **FastAPI Backend**: Robust backend with WebSocket support and JWT authentication.
-- **Thread-safe CustomTkinter UI**: Sleek, responsive, and robust desktop UI.
-
-## Getting Started
-
-1. **Install Dependencies**: Double-click `INSTALL.bat` to create a virtual environment and install all requirements.
-2. **Launch NOVA**: Double-click `START_NOVA.bat` to launch the server, the desktop client, and the floating toggle widget.
+Please see `ARCHITECTURE.md` for the foundational decisions regarding Linux distribution targets, hardware requirements, permission matrices, and security models.
 
 ## Structure
-
-- `server/`: Contains the FastAPI server, agent logic, local memory (brain), and UI clients.
-- `server/server_v6.py`: The FastAPI backend with WebSockets.
-- `server/nova_client.py`: The CustomTkinter desktop UI.
-- `server/nova_floating_toggle.py`: The quick-launch floating desktop widget.
-- `server/agents/orchestrator.py`: The intelligence routing logic.
-- `server/brain/nova_core.py`: Encrypted local memory system.
-
-## Documentation
-
-- `CAPSULE_NOTES.md`: Bug lists and sprint roadmap.
-- `NOVA_v6_Architecture.docx`: System architecture details.
-- `NOVA_AGI_Blueprint.docx`: AGI engine blueprints.
-- `NOVA_Cost_Breakdown.docx`: Hardware and cost breakdown for deployment.
+- `core/`: The heart of NOVA (Orchestrator, Memory, Security, Config).
+- `gui/`: The Linux-native graphical user interface.
+- `tools/`: The modular capability system (Offensive, Defensive, Developer).
+- `scripts/`: Deployment and maintenance utilities.

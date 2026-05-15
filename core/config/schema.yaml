@@ -1,0 +1,24 @@
+# NOVA v1 Global Configuration Schema
+version: "1.0"
+
+system:
+  environment: "production"
+  log_level: "INFO"
+  log_file: "/var/log/nova/audit.log"
+  sandbox_enabled: true
+
+models:
+  primary_llm: "llama3.1:8b"
+  vision_llm: "llava"
+  embedding_model: "nomic-embed-text"
+  api_endpoint: "http://localhost:11434/api"
+
+security:
+  permission_enforcement: true
+  auto_approve_tier0: true
+  require_sudo_for_tier2: true
+
+paths:
+  plugins_dir: "~/.nova/plugins"
+  backup_dir: "~/.nova/backups"
+  db_path: "~/.nova/memory.db"
