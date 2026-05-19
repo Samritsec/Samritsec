@@ -1,32 +1,37 @@
-# Hi, I'm Samrit Shrestha — aka `samritsec` 👨‍💻
+# NOVA v1
+**Linux-First AI Workstation Ecosystem**
 
-## Cybersecurity | Offensive Security | Ethical Hacker in Training
+NOVA is a modular, user-friendly desktop shell and AI orchestrator. It is built natively for Linux, serving as a powerful assistant overlaid with offensive/defensive security tools, developer workspaces, and sandboxed autonomy.
 
-I'm a cybersecurity student passionate about ethical hacking, red teaming, and offensive security research. I spend my time building home labs, breaking intentionally vulnerable machines, and sharpening my skills in real-world pentesting techniques.
+## Project Goal
+To create a strictly controlled but highly capable AI environment that can:
+- Assist in daily workflow via a modern GUI.
+- Plan and execute complex tasks safely.
+- Utilize modular tool packs.
+- Maintain an encrypted, persistent memory state.
 
----
+## Current State
+This repository has been reset. The old Windows-based legacy architecture has been completely purged. We are currently implementing the foundational architecture and GUI shell.
 
-### 🔧 My Lab Work
-- Built a complete offensive security home lab with Kali + Metasploitable
-- Exploited FTP, SSH, and web-based vulnerabilities using tools like Nmap, Metasploit, and Netcat
-- Currently practicing post-exploitation and privilege escalation
+Please see `ARCHITECTURE.md` for the foundational decisions regarding Linux distribution targets, hardware requirements, permission matrices, and security models.
 
----
+## Setup Instructions
 
-### 🧰 Tools & Skills
-`Kali Linux` • `Nmap` • `Metasploit` • `Hydra` • `Burp Suite` • `SQLMap` • `Linux Enumeration` • `Privilege Escalation` • `Wireshark` • `TryHackMe`
+NOVA is built natively for Linux. Ensure you have `python3` and `python3-venv` installed on your system.
 
----
+1. **Install dependencies:**
+   ```bash
+   ./scripts/install.sh
+   ```
+   *This will create a virtual environment (`venv`) and install PyQt6, PyYAML, and Cryptography.*
 
-### 📂 Featured Repositories
+2. **Launch the application:**
+   ```bash
+   ./scripts/start.sh
+   ```
 
-- [ethical-hacking-labs](https://github.com/Samritsec/ethical-hacking-labs) – My hands-on pentesting projects (Kali + Metasploitable)
-- [nmap-cheatsheet](https://github.com/Samritsec/nmap-cheatsheet) – Common recon commands
-- [linux-priv-esc-lab](https://github.com/Samritsec/linux-priv-esc-lab) – Privilege escalation examples & scripts
-
-
----
-
-### 📫 Let's Connect
-- LinkedIn: [linkedin.com/in/samritshrestha][(https://www.linkedin.com/in/samrit-shrestha) 
-- GitHub: [@Samritsec](https://github.com/Samritsec)
+## Structure
+- `core/`: The heart of NOVA (Orchestrator, Memory, Security, Config).
+- `gui/`: The Linux-native PyQt6 graphical user interface.
+- `tools/`: The modular capability system (Offensive, Defensive, Developer).
+- `scripts/`: Deployment and maintenance utilities (`install.sh`, `start.sh`).
